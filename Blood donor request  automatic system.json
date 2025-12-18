@@ -1,0 +1,349 @@
+{
+  "name": "Blood donor request",
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1w1T0rbVvuhNTxGai-UF_Smt0yt2vno50lS79e4CWwf8",
+          "mode": "list",
+          "cachedResultName": "blood donors",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1w1T0rbVvuhNTxGai-UF_Smt0yt2vno50lS79e4CWwf8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1w1T0rbVvuhNTxGai-UF_Smt0yt2vno50lS79e4CWwf8/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        384,
+        0
+      ],
+      "id": "de56ad8c-f7b4-4b0b-b4c1-d0cd2a938834",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ISzgUNafB9dqCTVG",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "36b93b75-b696-4281-b6a5-59007bc9caf4",
+              "leftValue": "={{ $json['Blood group'] }}",
+              "rightValue": "={{ $('Webhook').item.json.body.blood_group }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "c6f089cb-98b0-4e5c-aca2-6b760c44c1e0",
+              "leftValue": "={{ $json['Last time donation'] }}",
+              "rightValue": "={{ $('Calculate Date').item.json.eligible_date }}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "beforeOrEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        576,
+        0
+      ],
+      "id": "ab8e82c4-c58d-45ae-9bc0-b66b15edd441",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "operation": "subtractFromDate",
+        "magnitude": "={{ $now }}",
+        "timeUnit": "months",
+        "duration": 5,
+        "outputFieldName": "eligible_date",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "25a0fb0b-259b-4a72-ba0a-f833c6d43257",
+      "name": "Calculate Date"
+    },
+    {
+      "parameters": {
+        "phoneNumberId": "964447470074506",
+        "recipientPhoneNumber": "=+92{{ $json.PhoneNumber }}",
+        "template": "blood_donate_request|en"
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        928,
+        -16
+      ],
+      "id": "2dc9ee17-4d47-43d7-a078-04200e77be39",
+      "name": "Send template",
+      "webhookId": "9b2a560a-7f0e-49d8-9f67-0755a08190ec",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "iendtlI2awsNZFNT",
+          "name": "WhatsApp account 7"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1JPwJnDBbp8oTOvA8HGd07SRfhEKndkbXUfQEpbYIuAY",
+          "mode": "list",
+          "cachedResultName": "Confirmed Donors List",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JPwJnDBbp8oTOvA8HGd07SRfhEKndkbXUfQEpbYIuAY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JPwJnDBbp8oTOvA8HGd07SRfhEKndkbXUfQEpbYIuAY/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "DonorName": "={{ $json.Name }}",
+            "PhoneNumber": "={{ $json.contact }}",
+            "BloodGroup": "={{ $json['Blood group'] }}",
+            "Date sent": "={{ $now }}"
+          },
+          "matchingColumns": [
+            "Eligible Donors received message"
+          ],
+          "schema": [
+            {
+              "id": "Date sent",
+              "displayName": "Date sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "DonorName",
+              "displayName": "DonorName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "PhoneNumber",
+              "displayName": "PhoneNumber",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "BloodGroup",
+              "displayName": "BloodGroup",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        752,
+        0
+      ],
+      "id": "55a04056-225e-4c5b-b6bf-48d45af39399",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VTX0mPsjJDHqtNT3",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "blood-request",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2f47d52b-1d7e-4596-8ade-33842dca9a12",
+      "name": "Webhook",
+      "webhookId": "7a774c1b-cefc-4cf0-8990-b7f57c69d1a2"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "zahrakalsoom786.app.n8n.cloud",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+            "content-length": "33",
+            "accept": "*/*",
+            "accept-encoding": "gzip, br",
+            "accept-language": "en-US,en;q=0.9",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "116.71.175.24",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "PK",
+            "cf-ray": "9b0031ab4404fd2e-SIN",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "origin": "https://blood-donor-request-28yz.bolt.host",
+            "priority": "u=1, i",
+            "referer": "https://blood-donor-request-28yz.bolt.host/",
+            "sec-ch-ua": "\"Chromium\";v=\"142\", \"Google Chrome\";v=\"142\", \"Not_A Brand\";v=\"99\"",
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "\"Windows\"",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "cross-site",
+            "x-forwarded-for": "116.71.175.24, 162.158.108.152",
+            "x-forwarded-host": "zahrakalsoom786.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-93-55cb986576-vcwtn",
+            "x-is-trusted": "yes",
+            "x-real-ip": "116.71.175.24"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "blood_group": "O+",
+            "quantity": 1
+          },
+          "webhookUrl": "https://zahrakalsoom786.app.n8n.cloud/webhook-test/blood-request",
+          "executionMode": "test"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Date": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Calculate Date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d487b040-7736-44a1-ae07-c36791218d51",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "39628a22b4cc5f42391011c29cf47408d3258f5359a4d23746f7444b7ece63b5"
+  },
+  "id": "zr0w3JaNiT1YKDrP",
+  "tags": []
+}
