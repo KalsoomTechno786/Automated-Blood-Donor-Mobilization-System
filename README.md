@@ -25,9 +25,4 @@ Communication: WhatsApp Business API (Meta)
 
 Trigger: Webhook (JSON POST)
 
-How to Use
-Import the blood-donor-automation.json file into your n8n instance.
 
-Configure your credentials for Google Sheets and Meta (WhatsApp).
-
-Set the Webhook URL in your website's "Submit" button logic.
